@@ -35,6 +35,9 @@ class Server:
         # self.sonnet = pkl.load(self.sonnet_f)
         # self.sonnet_f.close()
         self.sonnet = indexer.PIndex("AllSonnets.txt")
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+        self.base=17837
+        self.clock=17997
 
     def new_client(self, sock):
         # add to all sockets and to new clients
@@ -98,11 +101,27 @@ class Server:
     def handle_msg(self, from_sock):
         # read msg code
         msg = myrecv(from_sock)
+        msg = json.loads(msg)
         if len(msg) > 0:
+            #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+            if msg["action"]=="produce_public_private":
+                from_name=self.logged_sock2name[from_sock]
+                to_name=msg["target"]
+                to_sock=self.logged_name2sock[to_name]
+                mysend(to_sock, json.dumps(
+                        {"action": "produce_public_private", 
+                        "target": from_name, "from": from_name,"message":msg["message"]}))
+            elif msg["action"]=="produce_shared_keys":
+                from_name=self.logged_sock2name[from_sock]
+                to_name=msg["target"]
+                to_sock=self.logged_name2sock[to_name]
+                mysend(to_sock, json.dumps(
+                        {"action": "produce_shared_keys", 
+                        "target": from_name, "from": from_name,"message":msg["message"]}))
             # ==============================================================================
             # handle connect request
             # ==============================================================================
-            msg = json.loads(msg)
+            
             if msg["action"] == "connect":
                 to_name = msg["target"]
                 from_name = self.logged_sock2name[from_sock]

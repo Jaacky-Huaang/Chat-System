@@ -6,7 +6,7 @@ import time
 # CHAT_IP = socket.gethostbyname(socket.gethostname())
 CHAT_IP = ''  # socket.gethostbyname(socket.gethostname())
 
-CHAT_PORT = 1112
+CHAT_PORT = 2369
 SERVER = (CHAT_IP, CHAT_PORT)
 
 menu = "\n++++ Choose one of the following commands\n \

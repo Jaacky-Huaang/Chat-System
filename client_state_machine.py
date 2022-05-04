@@ -5,6 +5,7 @@ Created on Sun Apr  5 00:00:32 2015
 """
 from chat_utils import *
 import json
+import secrets
 
 class ClientSM:
     def __init__(self, s):
@@ -13,6 +14,42 @@ class ClientSM:
         self.me = ''
         self.out_msg = ''
         self.s = s
+        
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+        # To give user a private key when login
+        self.private_key=secrets.randbits(17)
+        # The base of the public-private number. Requirement: base is the primitive root of the clock_key
+        self.base=17837
+        # The clock to be divided. Requirement: prime
+        self.clock=17997
+        #The shared key, undecided yet
+        self.shared_key=None
+
+    #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+    def get_public_private_key(self):
+         
+        return self.base**self.private_key%self.clock
+    
+    def get_shared_key(self,public_private_key):
+        #public_private_key**self.private_key%self.clock
+        
+        return public_private_key**self.private_key%self.clock
+    
+    def encode(self,msg):
+        encoded_msg=''
+        
+        for i in msg:
+            # use the built-in method ord()and chr() 
+            # to convert letters into digits and mess up the original message
+            encoded_msg+=chr(ord(i)+self.shared_key)
+        return encoded_msg
+
+    def decode(self,encoded_msg):
+        decoded_msg=''
+        for i in encoded_msg:
+            # the reversed operation of encode
+            decoded_msg+=chr(ord(i)-self.shared_key)
+        return decoded_msg
 
     def set_state(self, state):
         self.state = state
@@ -81,6 +118,16 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
+                        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+                    
+                        # send public_private_key to peer first 
+                        # and wait for peer's public_private_key
+                        public_private_key=self.get_public_private_key()
+                        mysend(self.s, json.dumps(
+                            {"action":"produce_public_private","target":self.peer,
+                            "message":public_private_key}))
+                    
+                    
                     else:
                         self.out_msg += 'Connection unsuccessful\n'
 
@@ -122,19 +169,62 @@ class ClientSM:
 #==============================================================================
         elif self.state == S_CHATTING:
             if len(my_msg) > 0:     # my stuff going out
+                self.public_private_key=self.get_public_private_key()
+                self.get_shared_key(self.public_private_key)
+                my_msg=self.encode(my_msg)
+                print("This is the encoded msg:",my_msg)
                 mysend(self.s, json.dumps({"action":"exchange", "from":"[" + self.me + "]", "message":my_msg}))
+                
                 if my_msg == 'bye':
                     self.disconnect()
                     self.state = S_LOGGEDIN
                     self.peer = ''
+                
             if len(peer_msg) > 0:    # peer's stuff, coming in
                 peer_msg = json.loads(peer_msg)
+
                 if peer_msg["action"] == "connect":
                     self.out_msg += "(" + peer_msg["from"] + " joined)\n"
+                #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+                # send self's ppkey for peers to get shared key
+                elif peer_msg["action"]=="produce_public_private":
+                    
+                    ppkey=self.get_public_private_key()
+                    print("This is ppkey:",ppkey)
+                    mysend(self.s, json.dumps(
+                            {"action":"produce_shared_keys","target":self.peer,
+                            "message":ppkey}))
+                    # Below this line, self.public_private_key
+                    # is the one received from peers
+                    #self.public_private_key=int(peer_msg["message"])
+                    self.shared_key=self.get_shared_key(int(peer_msg["message"]))
+                    print("This is shared key:",self.shared_key)
+                    self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
+                    self.out_msg += "\n"
+                    self.out_msg += '------------------------------------\n'
+                
+                # get peer's ppkey to produce shared key for self
+                elif peer_msg["action"]=="produce_shared_keys":
+                    
+                    #self.public_private_key=int(peer_msg["message"])
+                    self.shared_key=self.get_shared_key(int(peer_msg["message"]))
+                    print("This is shared key:",self.shared_key)
+                    self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
+                    self.out_msg += "\n"
+                    self.out_msg += '------------------------------------\n'
+
                 elif peer_msg["action"] == "disconnect":
                     self.state = S_LOGGEDIN
+                    self.out_msg='You are disconnected from ' + self.peer + '\n'
+                    self.peer=''
+                
                 else:
-                    self.out_msg += peer_msg["from"] + peer_msg["message"]
+                    #self.public_private_key=self.get_public_private_key()
+                    #self.shared_key=self.get_shared_key(self.get_public_private_key())
+                    #print("This is shared key:",self.shared_key)
+                    decoded_msg=self.decode(peer_msg["message"])
+                    print("This is the decoded_msg",decoded_msg)
+                    self.out_msg += peer_msg["from"] + decoded_msg
 
 
             # Display the menu again
