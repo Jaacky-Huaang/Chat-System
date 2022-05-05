@@ -180,6 +180,7 @@ class ClientSM:
                     self.state = S_LOGGEDIN
                     self.peer = ''
                 
+                    
             if len(peer_msg) > 0:    # peer's stuff, coming in
                 peer_msg = json.loads(peer_msg)
 

@@ -34,3 +34,27 @@ class Client:
         self.gui.run()
         print("gui is off")
         self.quit()
+#-------------------login with password------------------
+    def register_user(self,user,key):
+        msg = json.dumps({'action':'register','name':user,'password':key})
+        self.send(msg)
+        response = json.loads(self.recv())
+        if response['status'] == 'duplicate':
+            return '0'
+        elif response['status'] == 'ok':
+            return 'ok'
+        
+    def verify_user(self,user,key):
+        msg=json.dumps({'action':'login','name':user,'password':key})
+        self.send(msg)
+        response = json.loads(self.recv())
+        if response['status']=='ok':
+            self.name=user
+            return 'ok'
+        elif response['status']=='notregister':
+            return '1'
+        elif response['status']=='wrongpassword':
+            return '2'
+        elif response['status']=='duplicate':
+            return '3'
+            

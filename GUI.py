@@ -70,7 +70,25 @@ class GUI:
 
         # set the focus of the curser
         self.entryName.focus()
+        #--------------------start of password------------------
+        self.labelPassword = Label(self.login,
+                               text="Password: ",
+                               font="Helvetica 12")
 
+        self.labelPassword.place(relheight=0.2,
+                             relx=0.1,
+                             rely=0.43)
+        
+        self.entryPassword = Entry(self.login,
+                                   font="Helvetica 14")
+        self.entryPassword.place(relwidth=0.4,
+                             relheight=0.12,
+                             relx=0.35,
+                             rely=0.43)
+
+        
+        self.entryName.focus()
+#----------------------------end of password----------------------
         # create a Continue Button
         # along with action
         self.go = Button(self.login,
@@ -79,7 +97,7 @@ class GUI:
                          command=lambda: self.goAhead(self.entryName.get()))
 
         self.go.place(relx=0.4,
-                      rely=0.55)
+                      rely=0.64)
         self.Window.mainloop()
 
     def goAhead(self, name):
@@ -204,6 +222,32 @@ class GUI:
         self.textCons.insert(END, msg + "\n")
         self.textCons.config(state=DISABLED)
         self.textCons.see(END)
+        
+    def fileButton(self, msg):
+        self.file = Toplevel()
+        # set the title
+        self.file.title("File")
+        self.file.resizable(width=False,
+                             height=False)
+        self.file.configure(width=400,
+                             height=300)
+        
+        self.labelFile = Label(self.file,
+                               text="File: ",
+                               font="Helvetica 12")
+
+        self.labelFile.place(relheight=0.2,
+                             relx=0.1,
+                             rely=0.2)
+        self.entryFile = Entry(self.file,
+                               font="Helvetica 14")
+
+        self.entryFile.place(relwidth=0.4,
+                             relheight=0.12,
+                             relx=0.35,
+                             rely=0.2)
+        # create a Label
+        
 
     def proc(self):
         # print(self.msg)
@@ -224,8 +268,45 @@ class GUI:
 
     def run(self):
         self.login()
-
-
+        
+    def Register(self):
+        user = self.entNewUser.get()
+        key = self.entNewKey.get()
+        if user == '' or key == '':
+            messagebox.showwarning(
+                title='Invalid input', message='User name or password is empty')
+            return
+        else:
+            result = self.Client.register_user(user,key)
+            if result == '0':
+                messagebox.showerror(
+                    title='Error', message='You have already logged in. No need to register.')
+            elif result == 'ok':
+                messagebox.showinfo('Success','You have successfully registered!')
+    
+    def Login(self):
+        user = self.entUser.get()
+        key = self.entKey.get()
+        if user == '' or key == '':
+            messagebox.showwarning(
+                title='Invalid input!', message='User name or password is empty.')
+            return
+        result = self.Client.verify_user(user,key)
+        if result == 'ok':
+            self.user = user
+            print(user,'loggedin')
+            messagebox.showinfo('Success','You have successfully logged in!')
+            self.Client.sm.set_state(S_LOGGEDIN)
+            self.goto_main_window(self.user)
+        elif result == '1':
+            messagebox.showerror(
+                title='Error',message='User name does not exist.')
+        elif result == '2':
+            messagebox.showerror(
+                title='Error',message='User name or password is wrong.')
+        elif result == '3':
+            messagebox.showerror(
+                title='Error',message='You already logged in.')
 # create a GUI class object
 if __name__ == "__main__":
     # g = GUI()
