@@ -1,13 +1,11 @@
-"""
-Created on Sun Apr  5 00:00:32 2015
 
-@author: zhengzhang
-"""
 from chat_utils import *
 import json
 import secrets
+import os
 
 class ClientSM:
+
     def __init__(self, s):
         self.state = S_OFFLINE
         self.peer = ''
@@ -26,6 +24,13 @@ class ClientSM:
         self.shared_key=None
 
     #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+    #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
+
+    def start_game(self):
+        
+        os.system("python Snake.py")
+
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
     def get_public_private_key(self):
          
         return self.base**self.private_key%self.clock
@@ -110,7 +115,11 @@ class ClientSM:
                     logged_in = json.loads(myrecv(self.s))["results"]
                     self.out_msg += 'Here are all the users in the system:\n'
                     self.out_msg += logged_in
-
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈              
+                elif my_msg=="game":
+                    self.state=S_GAMING
+                    self.start_game()
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
                 elif my_msg[0] == 'c':
                     peer = my_msg[1:]
                     peer = peer.strip()
@@ -174,7 +183,14 @@ class ClientSM:
                 my_msg=self.encode(my_msg)
                 print("This is the encoded msg:",my_msg)
                 mysend(self.s, json.dumps({"action":"exchange", "from":"[" + self.me + "]", "message":my_msg}))
-                
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+                if my_msg=="game":
+                    self.state=S_GAMING
+                    mysend(self.s, json.dumps({"action":"game"}))
+                    self.start_game()
+
+
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
                 if my_msg == 'bye':
                     self.disconnect()
                     self.state = S_LOGGEDIN
@@ -225,8 +241,12 @@ class ClientSM:
                     decoded_msg=self.decode(peer_msg["message"])
                     print("This is the decoded_msg",decoded_msg)
                     self.out_msg += peer_msg["from"] + decoded_msg
-
-
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+            '''
+            elif self.state==S_GAMING:
+                self.game_client()
+                '''
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
             # Display the menu again
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu

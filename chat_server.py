@@ -1,8 +1,4 @@
-"""
-Created on Tue Jul 22 00:47:05 2014
 
-@author: alina, zzhang
-"""
 
 import time
 import socket
@@ -14,6 +10,7 @@ import json
 import pickle as pkl
 from chat_utils import *
 import chat_group as grp
+import os
 
 
 class Server:
@@ -211,7 +208,17 @@ class Server:
 # ==============================================================================
 #                 the "from" guy really, really has had enough
 # ==============================================================================
-
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+            '''
+            elif msg["action"]=="game":
+                self.count+=1
+                from_name = self.logged_sock2name[from_sock]
+                
+                the_guys = self.group.list_me(from_name)[1:]
+                for guy in the_guys:
+                to_sock = self.logged_name2sock[g]
+                    mysend(to_sock, json.dumps({"action": "game"}))  '''
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
         else:
             # client died unexpectedly
             self.logout(from_sock)
@@ -241,6 +248,7 @@ class Server:
 def main():
     server = Server()
     server.run()
+    os.system("python SnakeServer.py")
 
 
 if __name__ == "__main__":

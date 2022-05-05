@@ -6,7 +6,7 @@ import time
 # CHAT_IP = socket.gethostbyname(socket.gethostname())
 CHAT_IP = ''  # socket.gethostbyname(socket.gethostname())
 
-CHAT_PORT = 2369
+CHAT_PORT = 2309
 SERVER = (CHAT_IP, CHAT_PORT)
 
 menu = "\n++++ Choose one of the following commands\n \
@@ -21,7 +21,9 @@ S_OFFLINE = 0
 S_CONNECTED = 1
 S_LOGGEDIN = 2
 S_CHATTING = 3
-
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+S_GAMING=4
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
 SIZE_SPEC = 5
 
 CHAT_WAIT = 0.2
