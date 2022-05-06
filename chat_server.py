@@ -32,9 +32,11 @@ class Server:
         # self.sonnet = pkl.load(self.sonnet_f)
         # self.sonnet_f.close()
         self.sonnet = indexer.PIndex("AllSonnets.txt")
-        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-        self.base=17837
-        self.clock=17997
+# =============================================================================
+#         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+#         self.base=17837
+#         self.clock=17997
+# =============================================================================
 
     def new_client(self, sock):
         # add to all sockets and to new clients
@@ -47,25 +49,25 @@ class Server:
         # read the msg that should have login code plus username
         try:
             msg = json.loads(myrecv(sock))
-            print("login:", msg)
+            #print("login:", msg)
             if len(msg) > 0:
 
                 if msg["action"] == "login":
                     name = msg["name"]
                     password = msg['password']
 
-                    if name not in self.group.password.keys():
+                    if name not in self.grp.password(name,password).keys():
                         mysend(sock,json.dumps(
                             {'action':'login','status':'notregister'}))
-                        print(name+'not registered before')
+                        #print(name+'not registered before')
                         
-                    elif self.group.is_member(name) == True:
+                    elif self.grp.is_member(name) == True:
                         mysend(sock,json.dumps(
                             {'action':'login','status':'duplicate'}))
-                        print(name+'duplicate login attempt')
+                        #print(name+'duplicate login attempt')
                         
-                    elif name in self.group.password.keys() and self.group.is_member(name) != True:
-                        if self.group.password[name] == password:
+                    elif name in self.grp.password(name,password).keys() and self.grp.is_member(name) != True:
+                        if self.grp.password(name,password)[name] == password:
                             # move socket from new clients list to logged clients
                             self.new_clients.remove(sock)
                             # add into the name to sock mapping
@@ -78,27 +80,27 @@ class Server:
                                         open(name+'.idx', 'rb'))
                                 except IOError:  # chat index does not exist, then create one
                                     self.indices[name] = indexer.Index(name)
-                            print(name + ' logged in')
+                            #print(name + ' logged in')
                             self.group.join(name)
                             mysend(sock, json.dumps(
                                 {"action": "login", "status": "ok"}))
                         
                         else:  # a client under this name has already logged in
                             mysend(sock, json.dumps(
-                                {"action": "login", "status": "duplicate"}))
-                            print(name + ' duplicate login attempt')
+                                {"action": "login", "status": "wrongpassword"}))
+                            #print(name + ' wrong password!')
                 
                 elif msg['action'] == 'register':
                     name = msg['name']
                     password = msg['password']
-                    if name in self.user_password.keys():
+                    if name in self.password(name,password).keys():
                         mysend(sock,json.dumps(
                             {'action':'register','status':'duplicate'}))
                     else:
-                        self.group.password[name]=password
+                        self.grp.password(name,password)[name]=password
                         mysend(sock,json.dumps(
                             {'action':'register','status':'ok'}))
-                        print(name,'registered')
+                        #print(name,'registered')
                         
                 else:
                     print('wrong code received')
@@ -126,21 +128,23 @@ class Server:
         msg = myrecv(from_sock)
         msg = json.loads(msg)
         if len(msg) > 0:
-            #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-            if msg["action"]=="produce_public_private":
-                from_name=self.logged_sock2name[from_sock]
-                to_name=msg["target"]
-                to_sock=self.logged_name2sock[to_name]
-                mysend(to_sock, json.dumps(
-                        {"action": "produce_public_private", 
-                        "target": from_name, "from": from_name,"message":msg["message"]}))
-            elif msg["action"]=="produce_shared_keys":
-                from_name=self.logged_sock2name[from_sock]
-                to_name=msg["target"]
-                to_sock=self.logged_name2sock[to_name]
-                mysend(to_sock, json.dumps(
-                        {"action": "produce_shared_keys", 
-                        "target": from_name, "from": from_name,"message":msg["message"]}))
+# =============================================================================
+#             #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+#             if msg["action"]=="produce_public_private":
+#                 from_name=self.logged_sock2name[from_sock]
+#                 to_name=msg["target"]
+#                 to_sock=self.logged_name2sock[to_name]
+#                 mysend(to_sock, json.dumps(
+#                         {"action": "produce_public_private", 
+#                         "target": from_name, "from": from_name,"message":msg["message"]}))
+#             elif msg["action"]=="produce_shared_keys":
+#                 from_name=self.logged_sock2name[from_sock]
+#                 to_name=msg["target"]
+#                 to_sock=self.logged_name2sock[to_name]
+#                 mysend(to_sock, json.dumps(
+#                         {"action": "produce_shared_keys", 
+#                         "target": from_name, "from": from_name,"message":msg["message"]}))
+# =============================================================================
             # ==============================================================================
             # handle connect request
             # ==============================================================================

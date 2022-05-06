@@ -6,7 +6,8 @@ Created on Sun Apr  5 09:58:31 2015
 """
 S_ALONE = 0
 S_TALKING = 1
-
+#import sqlite3
+import json
 #==============================================================================
 # Group class:
 # member fields:
@@ -103,6 +104,102 @@ class Group:
                     if member != me:
                         my_list.append(member)
         return my_list
+#~~~~~~~~~~~~~~~~~~~~password---------------------    
+    def password(self,name,pswd):
+        filename = 'users.json'
+        try:
+            with open(filename) as f_obj:
+                return json.load(f_obj)
+
+        except FileNotFoundError: 
+        	 
+        	with open(filename, 'w') as f_obj: 
+        		json.dump({name: pswd}, sort_keys=True, indent=4, separators=(',', ': ')) #存储数据
+        		return json.load(f_obj)
+       
+#-----------------------------------------------------------------
+
+
+    '''def create_sql(self):
+        sql = sqlite3.connect("user_data.db")
+        sql.execute(
+            """create table if not exists
+            %s(
+            %s integer primary key autoincrement,
+            %s varchar(128),
+            %s varchar(128))"""
+            % ('user',
+               'id',
+               'name',
+               'passworld'))
+        sql.close()
+        return sql
+    
+    def password(self,name,password):
+    sql = sqlite3.connect("user_data.db")
+
+    sql.execute("insert into user(name,passworld) values(?,?)",
+                (name,passworld))
+    sql.commit()
+    print "添加成功"
+
+    sql.close()
+
+
+
+ 
+
+def showalldata():
+
+    sql = sqlite3.connect("user_data.db")
+
+    data=sql.execute("select * from user").fetchall()
+
+    sql.close()
+
+    return data
+
+#"select * from user"为查询user对应的表的所有资料的指令
+
+ 
+
+while 1:
+
+    option= """
+
+1:增加数据
+
+2:查询数据
+
+q:退出
+
+选择您想要的进行的操作:"""
+
+    cho = raw_input(option)
+
+    if cho=='1':
+
+        add_data()
+
+    elif cho=='2':
+
+        showalldata()
+
+    elif cho=='q':
+
+        break
+
+    else:
+
+        "输入错误"
+————————————————
+版权声明：本文为CSDN博主「hbqjzx」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/hbqjzx/article/details/109581938'''
+    
+    
+
+
+
 
 if __name__ == "__main__":
     g = Group()

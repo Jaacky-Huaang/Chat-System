@@ -13,15 +13,17 @@ class ClientSM:
         self.out_msg = ''
         self.s = s
         
-        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-        # To give user a private key when login
-        self.private_key=secrets.randbits(17)
-        # The base of the public-private number. Requirement: base is the primitive root of the clock_key
-        self.base=17837
-        # The clock to be divided. Requirement: prime
-        self.clock=17997
-        #The shared key, undecided yet
-        self.shared_key=None
+# =============================================================================
+#         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+#         # To give user a private key when login
+#         self.private_key=secrets.randbits(17)
+#         # The base of the public-private number. Requirement: base is the primitive root of the clock_key
+#         self.base=17837
+#         # The clock to be divided. Requirement: prime
+#         self.clock=17997
+#         #The shared key, undecided yet
+#         self.shared_key=None
+# =============================================================================
 
     #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
     #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
@@ -31,31 +33,33 @@ class ClientSM:
         os.system("python Snake.py")
 
 #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
-    def get_public_private_key(self):
-         
-        return self.base**self.private_key%self.clock
-    
-    def get_shared_key(self,public_private_key):
-        #public_private_key**self.private_key%self.clock
-        
-        return public_private_key**self.private_key%self.clock
-    
-    def encode(self,msg):
-        encoded_msg=''
-        
-        for i in msg:
-            # use the built-in method ord()and chr() 
-            # to convert letters into digits and mess up the original message
-            encoded_msg+=chr(ord(i)+self.shared_key)
-        return encoded_msg
-
-    def decode(self,encoded_msg):
-        decoded_msg=''
-        for i in encoded_msg:
-            # the reversed operation of encode
-            decoded_msg+=chr(ord(i)-self.shared_key)
-        return decoded_msg
-
+# =============================================================================
+#     def get_public_private_key(self):
+#          
+#         return self.base**self.private_key%self.clock
+#     
+#     def get_shared_key(self,public_private_key):
+#         #public_private_key**self.private_key%self.clock
+#         
+#         return public_private_key**self.private_key%self.clock
+#     
+#     def encode(self,msg):
+#         encoded_msg=''
+#         
+#         for i in msg:
+#             # use the built-in method ord()and chr() 
+#             # to convert letters into digits and mess up the original message
+#             encoded_msg+=chr(ord(i)+self.shared_key)
+#         return encoded_msg
+# 
+#     def decode(self,encoded_msg):
+#         decoded_msg=''
+#         for i in encoded_msg:
+#             # the reversed operation of encode
+#             decoded_msg+=chr(ord(i)-self.shared_key)
+#         return decoded_msg
+# 
+# =============================================================================
     def set_state(self, state):
         self.state = state
 
@@ -129,12 +133,14 @@ class ClientSM:
                         self.out_msg += '-----------------------------------\n'
                         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
                     
-                        # send public_private_key to peer first 
-                        # and wait for peer's public_private_key
-                        public_private_key=self.get_public_private_key()
-                        mysend(self.s, json.dumps(
-                            {"action":"produce_public_private","target":self.peer,
-                            "message":public_private_key}))
+# =============================================================================
+#                         # send public_private_key to peer first 
+#                         # and wait for peer's public_private_key
+#                         public_private_key=self.get_public_private_key()
+#                         mysend(self.s, json.dumps(
+#                             {"action":"produce_public_private","target":self.peer,
+#                             "message":public_private_key}))
+# =============================================================================
                     
                     
                     else:
@@ -202,33 +208,35 @@ class ClientSM:
 
                 if peer_msg["action"] == "connect":
                     self.out_msg += "(" + peer_msg["from"] + " joined)\n"
-                #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-                # send self's ppkey for peers to get shared key
-                elif peer_msg["action"]=="produce_public_private":
-                    
-                    ppkey=self.get_public_private_key()
-                    print("This is ppkey:",ppkey)
-                    mysend(self.s, json.dumps(
-                            {"action":"produce_shared_keys","target":self.peer,
-                            "message":ppkey}))
-                    # Below this line, self.public_private_key
-                    # is the one received from peers
-                    #self.public_private_key=int(peer_msg["message"])
-                    self.shared_key=self.get_shared_key(int(peer_msg["message"]))
-                    print("This is shared key:",self.shared_key)
-                    self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
-                    self.out_msg += "\n"
-                    self.out_msg += '------------------------------------\n'
-                
-                # get peer's ppkey to produce shared key for self
-                elif peer_msg["action"]=="produce_shared_keys":
-                    
-                    #self.public_private_key=int(peer_msg["message"])
-                    self.shared_key=self.get_shared_key(int(peer_msg["message"]))
-                    print("This is shared key:",self.shared_key)
-                    self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
-                    self.out_msg += "\n"
-                    self.out_msg += '------------------------------------\n'
+# =============================================================================
+#                 #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+#                 # send self's ppkey for peers to get shared key
+#                 elif peer_msg["action"]=="produce_public_private":
+#                     
+#                     ppkey=self.get_public_private_key()
+#                     print("This is ppkey:",ppkey)
+#                     mysend(self.s, json.dumps(
+#                             {"action":"produce_shared_keys","target":self.peer,
+#                             "message":ppkey}))
+#                     # Below this line, self.public_private_key
+#                     # is the one received from peers
+#                     #self.public_private_key=int(peer_msg["message"])
+#                     self.shared_key=self.get_shared_key(int(peer_msg["message"]))
+#                     print("This is shared key:",self.shared_key)
+#                     self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
+#                     self.out_msg += "\n"
+#                     self.out_msg += '------------------------------------\n'
+#                 
+#                 # get peer's ppkey to produce shared key for self
+#                 elif peer_msg["action"]=="produce_shared_keys":
+#                     
+#                     #self.public_private_key=int(peer_msg["message"])
+#                     self.shared_key=self.get_shared_key(int(peer_msg["message"]))
+#                     print("This is shared key:",self.shared_key)
+#                     self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
+#                     self.out_msg += "\n"
+#                     self.out_msg += '------------------------------------\n'
+# =============================================================================
 
                 elif peer_msg["action"] == "disconnect":
                     self.state = S_LOGGEDIN
