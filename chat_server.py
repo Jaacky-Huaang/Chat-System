@@ -11,6 +11,7 @@ import pickle as pkl
 from chat_utils import *
 import chat_group as grp
 import os
+import random
 
 
 class Server:
@@ -32,11 +33,13 @@ class Server:
         # self.sonnet = pkl.load(self.sonnet_f)
         # self.sonnet_f.close()
         self.sonnet = indexer.PIndex("AllSonnets.txt")
-# =============================================================================
-#         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-#         self.base=17837
-#         self.clock=17997
-# =============================================================================
+        self.last_msg=None
+
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+        self.base=17837
+        self.clock=17997
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+
 
     def new_client(self, sock):
         # add to all sockets and to new clients
@@ -119,7 +122,10 @@ class Server:
         self.all_sockets.remove(sock)
         self.group.leave(name)
         sock.close()
-
+    #😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
+    def set_history(self,msg):
+        self.last_msg=msg
+    #😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
 # ==============================================================================
 # main command switchboard
 # ==============================================================================
@@ -127,24 +133,28 @@ class Server:
         # read msg code
         msg = myrecv(from_sock)
         msg = json.loads(msg)
+        
         if len(msg) > 0:
-# =============================================================================
-#             #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-#             if msg["action"]=="produce_public_private":
-#                 from_name=self.logged_sock2name[from_sock]
-#                 to_name=msg["target"]
-#                 to_sock=self.logged_name2sock[to_name]
-#                 mysend(to_sock, json.dumps(
-#                         {"action": "produce_public_private", 
-#                         "target": from_name, "from": from_name,"message":msg["message"]}))
-#             elif msg["action"]=="produce_shared_keys":
-#                 from_name=self.logged_sock2name[from_sock]
-#                 to_name=msg["target"]
-#                 to_sock=self.logged_name2sock[to_name]
-#                 mysend(to_sock, json.dumps(
-#                         {"action": "produce_shared_keys", 
-#                         "target": from_name, "from": from_name,"message":msg["message"]}))
-# =============================================================================
+            self.set_history(msg)
+
+            #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+            if msg["action"]=="produce_public_private":
+                from_name=self.logged_sock2name[from_sock]
+                to_name=msg["target"]
+                to_sock=self.logged_name2sock[to_name]
+                mysend(to_sock, json.dumps(
+                        {"action": "produce_public_private", 
+                        "target": from_name, "from": from_name,"message":msg["message"]}))
+            elif msg["action"]=="produce_shared_keys":
+                from_name=self.logged_sock2name[from_sock]
+                to_name=msg["target"]
+                to_sock=self.logged_name2sock[to_name]
+                mysend(to_sock, json.dumps(
+                        {"action": "produce_shared_keys", 
+                        "target": from_name, "from": from_name,"message":msg["message"]}))
+            #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+
+
             # ==============================================================================
             # handle connect request
             # ==============================================================================
@@ -169,20 +179,68 @@ class Server:
                     msg = json.dumps(
                         {"action": "connect", "status": "no-user"})
                 mysend(from_sock, msg)
+
 # ==============================================================================
 # handle messeage exchange: one peer for now. will need multicast later
 # ==============================================================================
             elif msg["action"] == "exchange":
+                #😈😈😈😈😈😈😈😈😈😈😈😈
+                self.set_history(msg)
+                #😈😈😈😈😈😈😈😈😈😈😈😈
                 from_name = self.logged_sock2name[from_sock]
                 the_guys = self.group.list_me(from_name)
                 #said = msg["from"]+msg["message"]
                 said2 = text_proc(msg["message"], from_name)
                 self.indices[from_name].add_msg_and_index(said2)
+                
+                #Simulating a bad server that produces wrong messages😈
+                unreliable_msg=''
+                rate=0.01
+                for thing in msg["message"][:-1]:
+                    print(thing)
+                    error_prob=random.random()
+                    print(error_prob)
+                    if error_prob<=rate:
+                        mark=random.randint(1,255)
+                    else:
+                        mark=ord(thing)
+                    new_thing=chr(mark)
+                    print(new_thing)
+                    unreliable_msg+=new_thing
+                msg["message"]=unreliable_msg+msg["message"][-1]
+                #😈😈😈😈😈😈😈😈😈😈😈😈
+                
                 for g in the_guys[1:]:
                     to_sock = self.logged_name2sock[g]
                     self.indices[g].add_msg_and_index(said2)
                     mysend(to_sock, json.dumps(
-                        {"action": "exchange", "from": msg["from"], "message": msg["message"]}))
+                        {"action": "exchange", "from": msg["from"], 
+                         "message": msg["message"]}))
+            #😈😈😈😈😈😈😈😈😈😈😈😈
+            elif msg["action"] == "resend":
+                from_name = self.logged_sock2name[from_sock]
+                to_sock = self.logged_name2sock[from_name]
+
+                unreliable_msg=''
+                rate=0.01
+                for thing in self.last_msg["message"][-1]:
+                    print(thing)
+                    error_prob=random.random()
+                    print(error_prob)
+                    if error_prob<=rate:
+                        mark=random.randint(1,255)
+                    else:
+                        mark=ord(thing)
+                    new_thing=chr(mark)
+                    print(new_thing)
+                    unreliable_msg+=new_thing
+                    
+                self.last_msg["message"]=unreliable_msg+self.last_msg["message"][-1]
+                
+                mysend(to_sock, json.dumps(
+                        {"action": "exchange", "from": self.last_msg["from"], 
+                        "message": self.last_msg["message"]}))
+            #😈😈😈😈😈😈😈😈😈😈😈😈
 # ==============================================================================
 #                 listing available peers
 # ==============================================================================
@@ -235,20 +293,13 @@ class Server:
                     g = the_guys.pop()
                     to_sock = self.logged_name2sock[g]
                     mysend(to_sock, json.dumps({"action": "disconnect"}))
+
+        
 # ==============================================================================
 #                 the "from" guy really, really has had enough
 # ==============================================================================
-#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
-            '''
-            elif msg["action"]=="game":
-                self.count+=1
-                from_name = self.logged_sock2name[from_sock]
-                
-                the_guys = self.group.list_me(from_name)[1:]
-                for guy in the_guys:
-                to_sock = self.logged_name2sock[g]
-                    mysend(to_sock, json.dumps({"action": "game"}))  '''
-#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+
+
         else:
             # client died unexpectedly
             self.logout(from_sock)

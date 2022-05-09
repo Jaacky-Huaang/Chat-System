@@ -1,8 +1,8 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 30 13:36:58 2021
-
 @author: bing
 """
 #This is a test!!！
@@ -272,13 +272,11 @@ class GUI:
         self.labelFile = Label(self.file,
                                text="File: ",
                                font="Helvetica 12")
-
         self.labelFile.place(relheight=0.2,
                              relx=0.1,
                              rely=0.2)
         self.entryFile = Entry(self.file,
                                font="Helvetica 14")
-
         self.entryFile.place(relwidth=0.4,
                              relheight=0.12,
                              relx=0.35,
