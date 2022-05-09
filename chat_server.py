@@ -36,8 +36,8 @@ class Server:
         self.last_msg=None
 
         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-        self.base=17837
-        self.clock=17997
+        self.base=6
+        self.clock=11
         #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
 
 
@@ -52,59 +52,33 @@ class Server:
         # read the msg that should have login code plus username
         try:
             msg = json.loads(myrecv(sock))
-            #print("login:", msg)
+            print("login:", msg)
             if len(msg) > 0:
 
                 if msg["action"] == "login":
                     name = msg["name"]
-                    password = msg['password']
 
-                    if name not in self.grp.password(name,password).keys():
-                        mysend(sock,json.dumps(
-                            {'action':'login','status':'notregister'}))
-                        #print(name+'not registered before')
-                        
-                    elif self.grp.is_member(name) == True:
-                        mysend(sock,json.dumps(
-                            {'action':'login','status':'duplicate'}))
-                        #print(name+'duplicate login attempt')
-                        
-                    elif name in self.grp.password(name,password).keys() and self.grp.is_member(name) != True:
-                        if self.grp.password(name,password)[name] == password:
-                            # move socket from new clients list to logged clients
-                            self.new_clients.remove(sock)
-                            # add into the name to sock mapping
-                            self.logged_name2sock[name] = sock
-                            self.logged_sock2name[sock] = name
-                            # load chat history of that user
-                            if name not in self.indices.keys():
-                                try:
-                                    self.indices[name] = pkl.load(
-                                        open(name+'.idx', 'rb'))
-                                except IOError:  # chat index does not exist, then create one
-                                    self.indices[name] = indexer.Index(name)
-                            #print(name + ' logged in')
-                            self.group.join(name)
-                            mysend(sock, json.dumps(
-                                {"action": "login", "status": "ok"}))
-                        
-                        else:  # a client under this name has already logged in
-                            mysend(sock, json.dumps(
-                                {"action": "login", "status": "wrongpassword"}))
-                            #print(name + ' wrong password!')
-                
-                elif msg['action'] == 'register':
-                    name = msg['name']
-                    password = msg['password']
-                    if name in self.password(name,password).keys():
-                        mysend(sock,json.dumps(
-                            {'action':'register','status':'duplicate'}))
-                    else:
-                        self.grp.password(name,password)[name]=password
-                        mysend(sock,json.dumps(
-                            {'action':'register','status':'ok'}))
-                        #print(name,'registered')
-                        
+                    if self.group.is_member(name) != True:
+                        # move socket from new clients list to logged clients
+                        self.new_clients.remove(sock)
+                        # add into the name to sock mapping
+                        self.logged_name2sock[name] = sock
+                        self.logged_sock2name[sock] = name
+                        # load chat history of that user
+                        if name not in self.indices.keys():
+                            try:
+                                self.indices[name] = pkl.load(
+                                    open(name+'.idx', 'rb'))
+                            except IOError:  # chat index does not exist, then create one
+                                self.indices[name] = indexer.Index(name)
+                        print(name + ' logged in')
+                        self.group.join(name)
+                        mysend(sock, json.dumps(
+                            {"action": "login", "status": "ok"}))
+                    else:  # a client under this name has already logged in
+                        mysend(sock, json.dumps(
+                            {"action": "login", "status": "duplicate"}))
+                        print(name + ' duplicate login attempt')
                 else:
                     print('wrong code received')
             else:  # client died unexpectedly
@@ -135,7 +109,7 @@ class Server:
         msg = json.loads(msg)
         
         if len(msg) > 0:
-            self.set_history(msg)
+
 
             #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
             if msg["action"]=="produce_public_private":
@@ -195,7 +169,7 @@ class Server:
                 
                 #Simulating a bad server that produces wrong messages😈
                 unreliable_msg=''
-                rate=0.01
+                rate=0.4
                 for thing in msg["message"][:-1]:
                     print(thing)
                     error_prob=random.random()
@@ -207,7 +181,7 @@ class Server:
                     new_thing=chr(mark)
                     print(new_thing)
                     unreliable_msg+=new_thing
-                msg["message"]=unreliable_msg+msg["message"][-1]
+                unreliable_msg=unreliable_msg+msg["message"][-1]
                 #😈😈😈😈😈😈😈😈😈😈😈😈
                 
                 for g in the_guys[1:]:
@@ -215,15 +189,16 @@ class Server:
                     self.indices[g].add_msg_and_index(said2)
                     mysend(to_sock, json.dumps(
                         {"action": "exchange", "from": msg["from"], 
-                         "message": msg["message"]}))
+                         "message": unreliable_msg}))
             #😈😈😈😈😈😈😈😈😈😈😈😈
             elif msg["action"] == "resend":
                 from_name = self.logged_sock2name[from_sock]
                 to_sock = self.logged_name2sock[from_name]
 
                 unreliable_msg=''
-                rate=0.01
-                for thing in self.last_msg["message"][-1]:
+                rate=0.0
+                print(self.last_msg)
+                for thing in self.last_msg["message"][:-1]:
                     print(thing)
                     error_prob=random.random()
                     print(error_prob)

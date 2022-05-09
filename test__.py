@@ -1,2 +1,2 @@
-import os
-os.system("python SnakeServer.py")
+a='a'
+a+='1'
