@@ -15,7 +15,7 @@ class ClientSM:
         self.s = s
         
 
-        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging👇⭐️⭐️⭐️______________
         # To give user a private key when login
         #self.private_key=secrets.randbits(17)
         self.private_key=random.randint(1,25)
@@ -26,7 +26,7 @@ class ClientSM:
         #The shared key, undecided yet
         self.shared_key=None
         self.public_private_key=self.base**self.private_key%self.clock
-
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging👆⭐️⭐️⭐️______________
 
 
     #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
@@ -128,11 +128,11 @@ class ClientSM:
                     logged_in = json.loads(myrecv(self.s))["results"]
                     self.out_msg += 'Here are all the users in the system:\n'
                     self.out_msg += logged_in
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈              
-#                 elif my_msg=="game":
-#                     self.state=S_GAMING
-#                     self.start_game()
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈              
+                elif my_msg=="game":
+                    self.state=S_GAMING
+                    self.start_game()
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 
                 elif my_msg[0] == 'c':
                     peer = my_msg[1:]
                     peer = peer.strip()
@@ -263,6 +263,7 @@ class ClientSM:
                     self.peer=''
                 
                 else:
+                    #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
                     # self.public_private_key=self.get_public_private_key()
                     # self.shared_key=self.get_shared_key(self.get_public_private_key())
                     print("This is shared key: ",self.shared_key)
@@ -271,8 +272,8 @@ class ClientSM:
 
                     decoded_msg=self.decode(encoded_msg)
                     print("This is the decoded_msg: ",decoded_msg)
-                    
-                    
+                    #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+                    #😈😈😈😈😈😈😈😈😈😈😈😈
                     check_sum=int(decoded_msg[-1])
 
                     sum=0
@@ -288,6 +289,7 @@ class ClientSM:
                     else:
                         
                        mysend(self.s, json.dumps({"action":"resend"}))
+                    #😈😈😈😈😈😈😈😈😈😈😈😈
 
                     
 

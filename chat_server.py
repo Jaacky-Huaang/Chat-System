@@ -96,7 +96,7 @@ class Server:
         self.all_sockets.remove(sock)
         self.group.leave(name)
         sock.close()
-    #😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
+    #😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈存一下上一条exchange的消息
     def set_history(self,msg):
         self.last_msg=msg
     #😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈
@@ -158,16 +158,16 @@ class Server:
 # handle messeage exchange: one peer for now. will need multicast later
 # ==============================================================================
             elif msg["action"] == "exchange":
-                #😈😈😈😈😈😈😈😈😈😈😈😈
+                #😈😈😈😈😈😈😈😈😈😈😈😈这一段reliable messaging的和原代码是混在一起的
                 self.set_history(msg)
-                #😈😈😈😈😈😈😈😈😈😈😈😈
+                
                 from_name = self.logged_sock2name[from_sock]
                 the_guys = self.group.list_me(from_name)
                 #said = msg["from"]+msg["message"]
                 said2 = text_proc(msg["message"], from_name)
                 self.indices[from_name].add_msg_and_index(said2)
                 
-                #Simulating a bad server that produces wrong messages😈
+                #Simulating a bad server that produces wrong messages
                 unreliable_msg=''
                 rate=0.4
                 for thing in msg["message"][:-1]:
@@ -182,7 +182,7 @@ class Server:
                     print(new_thing)
                     unreliable_msg+=new_thing
                 unreliable_msg=unreliable_msg+msg["message"][-1]
-                #😈😈😈😈😈😈😈😈😈😈😈😈
+                
                 
                 for g in the_guys[1:]:
                     to_sock = self.logged_name2sock[g]
@@ -190,7 +190,7 @@ class Server:
                     mysend(to_sock, json.dumps(
                         {"action": "exchange", "from": msg["from"], 
                          "message": unreliable_msg}))
-            #😈😈😈😈😈😈😈😈😈😈😈😈
+            
             elif msg["action"] == "resend":
                 from_name = self.logged_sock2name[from_sock]
                 to_sock = self.logged_name2sock[from_name]
