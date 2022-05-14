@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -329,3 +330,4 @@ class GUI:
 if __name__ == "__main__":
     # g = GUI()
     pass
+

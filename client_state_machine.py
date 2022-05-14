@@ -3,6 +3,7 @@ from chat_utils import *
 import json
 import secrets
 import os
+import random
 
 class ClientSM:
 
@@ -14,34 +15,35 @@ class ClientSM:
         self.s = s
         
 
-        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging👇⭐️⭐️⭐️______________
         # To give user a private key when login
-        self.private_key=secrets.randbits(17)
+        #self.private_key=secrets.randbits(17)
+        self.private_key=random.randint(1,25)
         # The base of the public-private number. Requirement: base is the primitive root of the clock_key
-        self.base=17837
+        self.base=6
         # The clock to be divided. Requirement: prime
-        self.clock=17997
+        self.clock=11
         #The shared key, undecided yet
         self.shared_key=None
-
+        self.public_private_key=self.base**self.private_key%self.clock
+        #####_________________⭐️⭐️⭐️Implemented for Secure Messaging👆⭐️⭐️⭐️______________
 
 
     #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈    
 
-    # def start_game(self):
+    def start_game(self):
         
-    #     os.system("python Snake.py")
+        os.system("python Snake.py")
 
   
 #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
 
     def get_public_private_key(self):
-         
-        return self.base**self.private_key%self.clock
+         return self.base**self.private_key%self.clock
     
     def get_shared_key(self,public_private_key):
         #public_private_key**self.private_key%self.clock
-        
+        #self.shared_key=public_private_key**self.private_key%self.clock
         return public_private_key**self.private_key%self.clock
     
     def encode(self,msg):
@@ -50,6 +52,8 @@ class ClientSM:
         for i in msg:
             # use the built-in method ord()and chr() 
             # to convert letters into digits and mess up the original message
+            print(i,ord(i))
+            print(ord(i)+self.shared_key)
             encoded_msg+=chr(ord(i)+self.shared_key)
         return encoded_msg
 
@@ -57,6 +61,9 @@ class ClientSM:
         decoded_msg=''
         for i in encoded_msg:
             # the reversed operation of encode
+            print(i,ord(i))
+            print(ord(i)-self.shared_key)
+            print(chr(ord(i)-self.shared_key))
             decoded_msg+=chr(ord(i)-self.shared_key)
         return decoded_msg
 
@@ -121,11 +128,11 @@ class ClientSM:
                     logged_in = json.loads(myrecv(self.s))["results"]
                     self.out_msg += 'Here are all the users in the system:\n'
                     self.out_msg += logged_in
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈              
-#                 elif my_msg=="game":
-#                     self.state=S_GAMING
-#                     self.start_game()
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈              
+                elif my_msg=="game":
+                    self.state=S_GAMING
+                    self.start_game()
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 
                 elif my_msg[0] == 'c':
                     peer = my_msg[1:]
                     peer = peer.strip()
@@ -134,10 +141,10 @@ class ClientSM:
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
 #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
-                        public_private_key=self.get_public_private_key()
+                        
                         mysend(self.s, json.dumps(
                              {"action":"produce_public_private","target":self.peer,
-                             "message":public_private_key}))
+                             "message":self.public_private_key}))
 #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
                     
                     
@@ -182,11 +189,21 @@ class ClientSM:
 #==============================================================================
         elif self.state == S_CHATTING:
 
-            if len(my_msg) > 0:     # my stuff going out
-                self.public_private_key=self.get_public_private_key()
-                self.get_shared_key(self.public_private_key)
-                my_msg=self.encode(my_msg)
+
+            if len(my_msg) > 0:  
+                if my_msg == 'bye':
+                    self.disconnect()
+                    self.state = S_LOGGEDIN
+                    self.peer = ''   
+                elif my_msg=="game":
+                    self.state=S_GAMING
+                    mysend(self.s, json.dumps({"action":"game"}))
+                    self.start_game()
+
+                #self.shared_key=self.get_shared_key(self.public_private_key)
+                
                 print("This is the encoded msg:",my_msg)
+                print("This is the shared key: ",self.shared_key)
                 
                 sum=0
                 for thing in my_msg:
@@ -195,22 +212,15 @@ class ClientSM:
                 checksum=str(sum)[-1]
                 my_msg+=checksum
                 
+                my_msg=self.encode(my_msg)
+
                 mysend(self.s, json.dumps(
                     {"action":"exchange", "from":"[" + self.me + "]", 
                     "message":my_msg}))
-                print("This is the original message with sum: "+my_msg)
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
-#                 if my_msg=="game":
-#                     self.state=S_GAMING
-#                     mysend(self.s, json.dumps({"action":"game"}))
-#                     self.start_game()
-# #🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
-                if my_msg == 'bye':
-                    self.disconnect()
-                    self.state = S_LOGGEDIN
-                    self.peer = ''
-                
-                    
+                print("This is the encoded message with sum: "+my_msg)
+
+#========================self/peer======================== 
+
             if len(peer_msg) > 0:    # peer's stuff, coming in
                 peer_msg = json.loads(peer_msg)
 
@@ -228,7 +238,7 @@ class ClientSM:
                             "message":ppkey}))
                     # Below this line, self.public_private_key
                     # is the one received from peers
-                    #self.public_private_key=int(peer_msg["message"])
+                    # self.public_private_key=int(peer_msg["message"])
                     self.shared_key=self.get_shared_key(int(peer_msg["message"]))
                     print("This is shared key:",self.shared_key)
                     self.out_msg += "Your messages have been encoded thanks to Jacky!\n"
@@ -253,26 +263,37 @@ class ClientSM:
                     self.peer=''
                 
                 else:
-                    self.public_private_key=self.get_public_private_key()
-                    self.shared_key=self.get_shared_key(self.get_public_private_key())
-                    print("This is shared key:",self.shared_key)
-                    decoded_msg=self.decode(peer_msg["message"])
-                    print("This is the decoded_msg",decoded_msg)
+                    #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+                    # self.public_private_key=self.get_public_private_key()
+                    # self.shared_key=self.get_shared_key(self.get_public_private_key())
+                    print("This is shared key: ",self.shared_key)
+                    encoded_msg=peer_msg["message"]
+                    print("This is the encoded message from peer with sum: "+peer_msg["message"])
+
+                    decoded_msg=self.decode(encoded_msg)
+                    print("This is the decoded_msg: ",decoded_msg)
+                    #####_________________⭐️⭐️⭐️Implemented for Secure Messaging⭐️⭐️⭐️______________
+                    #😈😈😈😈😈😈😈😈😈😈😈😈
+                    check_sum=int(decoded_msg[-1])
 
                     sum=0
-                    print(decoded_msg)
+                    
                     for thing in decoded_msg[:-1]:
-                        print(thing)
+                        
                         mark=ord(thing)
                         sum+=mark
-                        
                     print(sum)
-                    check_sum=int(decoded_msg[-1])
+                    print(check_sum)
                     if int(str(sum)[-1])==check_sum:
                         self.out_msg += peer_msg["from"] + decoded_msg[:-1]
                     else:
-                       print("This is not the original message: "+decoded_msg)
+                        
                        mysend(self.s, json.dumps({"action":"resend"}))
+                    #😈😈😈😈😈😈😈😈😈😈😈😈
+
+                    
+
+                    
 
             # Display the menu again
             if self.state == S_LOGGEDIN:
