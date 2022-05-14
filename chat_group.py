@@ -105,18 +105,20 @@ class Group:
                         my_list.append(member)
         return my_list
 #~~~~~~~~~~~~~~~~~~~~password---------------------    
-    def password(self,name,pswd):
-        filename = 'users.json'
-        try:
-            with open(filename) as f_obj:
-                return json.load(f_obj)
 
-        except FileNotFoundError: 
-        	 
-        	with open(filename, 'w') as f_obj: 
-        		json.dump({name: pswd}, sort_keys=True, indent=4, separators=(',', ': ')) #存储数据
-        		return json.load(f_obj)
-       
+
+# =============================================================================
+#     def password(self,name,pswd):
+#         filename = 'users.json'
+#         try:
+#             with open(filename) as f_obj:
+#                 return json.load(f_obj)
+#  
+#         except FileNotFoundError: 
+#             with open(filename, 'w') as f_obj: 
+#                 json.dump({name: pswd}, sort_keys=True, indent=4, separators=(',', ': ')) #存储数据
+#                 return json.load(f_obj)
+# =============================================================================
 #-----------------------------------------------------------------
 
 

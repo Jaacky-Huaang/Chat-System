@@ -14,7 +14,7 @@ from tkinter import font
 from tkinter import ttk
 from chat_utils import *
 import json
-
+from tkinter import messagebox
 
 # GUI class for the chat
 
@@ -71,7 +71,9 @@ class GUI:
 
         # set the focus of the curser
         self.entryName.focus()
-        #~~~~~~~~~~~~~~~start of password------------------
+        
+        
+#***************START***OF***PASSWORD*************************************
         self.labelPassword = Label(self.login,
                                text="Password: ",
                                font="Helvetica 12")
@@ -97,39 +99,56 @@ class GUI:
         self.go = Button(self.login,
                          text="CONTINUE",
                          font="Helvetica 14 bold",
-                         command=lambda: self.goAhead(self.entryName.get(),self.entryPassword.get()))
+                         command=lambda: self.goAhead((self.entryName.get(),self.entryPassword.get())))
 
         self.go.place(relx=0.15,
                       rely=0.64)
-        
+#***************Password*************************************       
         self.regi = Button(self.login,
                          text="REGISTER",
                          font="Helvetica 14 bold",
-                         command=lambda: self.Register(self.entryName.get(),self.entryPassword.get()))
+                         command=lambda: self.Register((self.entryName.get(),self.entryPassword.get())))
         
         self.regi.place(relx=0.45,
                       rely=0.64)
-        
+#*****************end of password*********************************        
         
         self.Window.mainloop()
-  #~~~~~~~~~~~~~~~~~~~~~~~password~~~~~~~~~~~~~~~~~~~~~~~`      
-    '''def Check(self,name,pswd):
         
-        lst1=json.load(self.recv())
-        lst2 = []
-        for i in lst1:
-            lst2.append(i['name'])
-            
-        if name in lst2:
-            self.Login(name,pswd)
+#************ A Function for Password *************************      
+    def Register(self,nameAndPswd):
+        nm=nameAndPswd[0]
+        pswd=nameAndPswd[1]
+        #print(nm,pswd)
+        
+        if nm == '' or pswd == '':
+            messagebox.showwarning(
+                title='Invalid input', message='User name or password is empty')
+            #return
+        
         else:
-            self.Register(name,pswd)'''
-  #-----------------------------------------------------------------      
-    def goAhead(self, name, pswd):
+            msg = json.dumps({'action':'register','name':nm,'password':pswd})
+            self.send(msg)
+            response = json.loads(self.recv())
+            #print(response)
+            #result = self.register_user(nm,pswd)
+            if response['status'] == 'duplicate':
+                messagebox.showerror(
+                    title='Error', message='You have already logged in. No need to register.')
+            elif response['status'] == 'ok':
+                messagebox.showinfo('Success','You have successfully registered!')
+                
+                
+#*******************Something added below for password*******************              
+ 
+    def goAhead(self, nameAndPswd):
+        name=nameAndPswd[0]
+        pswd=nameAndPswd[1]
         if len(name) > 0:
             msg = json.dumps({"action": "login", "name": name,'password':pswd})
             self.send(msg)
             response = json.loads(self.recv())
+            #print(response)
             if response["status"] == 'ok':
                 self.login.destroy()
                 self.sm.set_state(S_LOGGEDIN)
@@ -153,7 +172,7 @@ class GUI:
             elif response['status'] == 'wrongpassword':
                 messagebox.showerror(
                     title='Error',message='User name or password is wrong.')
-                
+ #***************************************************               
                 # while True:
                 #     self.proc()
         # the thread to receive messages
@@ -303,80 +322,7 @@ class GUI:
 
     def run(self):
         self.login()
-  #~~~~~~~~~~~~~~~~~~~~~~password----------------------------- 
-    def register_user(self,user,key):
-        msg = json.dumps({'action':'register','name':user,'password':key})
-        self.send(msg)
-        response = json.loads(self.recv())
-        if response['status'] == 'duplicate':
-            return '0'
-        elif response['status'] == 'ok':
-            return 'ok'
-        
-    def verify_user(self,user,key):
-        msg=json.dumps({'action':'login','name':user,'password':key})
-        self.send(msg)
-        response = json.loads(self.recv())
-        if response['status']=='ok':
-            self.name=user
-            return 'ok'
-        elif response['status']=='notregister':
-            return '1'
-        elif response['status']=='wrongpassword':
-            return '2'
-        elif response['status']=='duplicate':
-            return '3'
-        
-    def Register(self,nm,pswd):
-        
-        if nm == '' or pswd == '':
-            messagebox.showwarning(
-                title='Invalid input', message='User name or password is empty')
-            return
-        else:
-            result = self.register_user(nm,pswd)
-            if result == '0':
-                messagebox.showerror(
-                    title='Error', message='You have already logged in. No need to register.')
-            elif result == 'ok':
-                messagebox.showinfo('Success','You have successfully registered!')
-# =============================================================================
-#                 self.login.destroy()
-#                 self.sm.set_state(S_LOGGEDIN)
-#                 self.sm.set_myname(name)
-#                 self.layout(name)
-#                 self.textCons.config(state=NORMAL)
-#                 # self.textCons.insert(END, "hello" +"\n\n")
-#                 self.textCons.insert(END, menu + "\n\n")
-#                 self.textCons.config(state=DISABLED)
-#                 self.textCons.see(END)
-#                 process = threading.Thread(target=self.proc)
-#                 process.daemon = True
-#                 process.start()
-# =============================================================================
-    
-    '''def Login(self,nm,pswd):
-        
-        if nm == '' or pswd == '':
-            messagebox.showwarning(
-                title='Invalid input!', message='User name or password is empty.')
-            return
-        result = self.verify_user(nm,pswd)
-        if result == 'ok':
-            self.nm = nm
-            print(nm,'loggedin')
-            messagebox.showinfo('Success','You have successfully logged in!')
-            self.Client.sm.set_state(S_LOGGEDIN)
-            self.goto_main_window(self.nm)
-        elif result == '1':
-            messagebox.showerror(
-                title='Error',message='User name does not exist.')
-        elif result == '2':
-            messagebox.showerror(
-                title='Error',message='User name or password is wrong.')
-        elif result == '3':
-            messagebox.showerror(
-                title='Error',message='You already logged in.')'''
+ 
             
             #----------------------------------------------
 # create a GUI class object

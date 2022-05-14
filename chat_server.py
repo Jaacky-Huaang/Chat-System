@@ -28,6 +28,7 @@ class Server:
         self.all_sockets.append(self.server)
         # initialize past chat indices
         self.indices = {}
+        self.users=dict()
         # sonnet
         # self.sonnet_f = open('AllSonnets.txt.idx', 'rb')
         # self.sonnet = pkl.load(self.sonnet_f)
@@ -47,6 +48,7 @@ class Server:
         sock.setblocking(0)
         self.new_clients.append(sock)
         self.all_sockets.append(sock)
+        
 
     def login(self, sock):
         # read the msg that should have login code plus username
@@ -54,23 +56,25 @@ class Server:
             msg = json.loads(myrecv(sock))
             #print("login:", msg)
             if len(msg) > 0:
-
+                
+#***********************START***OF***PASSWORD*************************
                 if msg["action"] == "login":
                     name = msg["name"]
                     password = msg['password']
+                    #exist_users=self.password(name, password)
 
-                    if name not in self.grp.password(name,password).keys():
+                    if name not in self.users.keys():
                         mysend(sock,json.dumps(
                             {'action':'login','status':'notregister'}))
                         #print(name+'not registered before')
                         
-                    elif self.grp.is_member(name) == True:
+                    elif self.group.is_member(name) == True:
                         mysend(sock,json.dumps(
                             {'action':'login','status':'duplicate'}))
                         #print(name+'duplicate login attempt')
                         
-                    elif name in self.grp.password(name,password).keys() and self.grp.is_member(name) != True:
-                        if self.grp.password(name,password)[name] == password:
+                    elif name in self.users.keys() and self.group.is_member(name) != True:
+                        if self.users[name] == password:
                             # move socket from new clients list to logged clients
                             self.new_clients.remove(sock)
                             # add into the name to sock mapping
@@ -96,11 +100,12 @@ class Server:
                 elif msg['action'] == 'register':
                     name = msg['name']
                     password = msg['password']
-                    if name in self.password(name,password).keys():
+                    print(name,password)
+                    if name in self.users.keys():
                         mysend(sock,json.dumps(
                             {'action':'register','status':'duplicate'}))
                     else:
-                        self.grp.password(name,password)[name]=password
+                        self.users[name]=password
                         mysend(sock,json.dumps(
                             {'action':'register','status':'ok'}))
                         #print(name,'registered')
@@ -111,6 +116,8 @@ class Server:
                 self.logout(sock)
         except:
             self.all_sockets.remove(sock)
+#***************END***OF***PASSWORD*****************************************
+
 
     def logout(self, sock):
         # remove sock from all lists
