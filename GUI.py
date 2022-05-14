@@ -32,62 +32,59 @@ class GUI:
         self.system_msg = ""
 
     def login(self):
-        # login window
-        self.login = Toplevel()
-        # set the title
-        self.login.title("Login")
-        self.login.resizable(width=False,
-                             height=False)
-        self.login.configure(width=400,
-                             height=300)
-        # create a Label
-        self.pls = Label(self.login,
-                         text="Please login to continue",
-                         justify=CENTER,
-                         font="Helvetica 14 bold")
+         # login window
+         self.login = Toplevel()
+         # set the title
+         self.login.title("Login")
+         self.login.resizable(width=False,
+                              height=False)
+         self.login.configure(width=400,
+                              height=300)
+         # create a Label
+         self.pls = Label(self.login,
+                          text="Please login to continue",
+                          justify=CENTER,
+                          font="Helvetica 14 bold")
 
-        self.pls.place(relheight=0.15,
-                       relx=0.2,
-                       rely=0.07)
-        # create a Label
-        self.labelName = Label(self.login,
-                               text="Name: ",
-                               font="Helvetica 12")
+         self.pls.place(relheight=0.15,
+                        relx=0.2,
+                        rely=0.07)
+         # create a Label
+         self.labelName = Label(self.login,
+                                text="Name: ",
+                                font="Helvetica 12")
 
-        self.labelName.place(relheight=0.2,
-                             relx=0.1,
-                             rely=0.2)
+         self.labelName.place(relheight=0.2,
+                              relx=0.1,
+                              rely=0.2)
 
-        # create a entry box for
-        # tyoing the message
-        self.entryName = Entry(self.login,
-                               font="Helvetica 14")
+         # create a entry box for
+         # tyoing the message
+         self.entryName = Entry(self.login,
+                                font="Helvetica 14")
 
-        self.entryName.place(relwidth=0.4,
-                             relheight=0.12,
-                             relx=0.35,
-                             rely=0.2)
+         self.entryName.place(relwidth=0.4,
+                              relheight=0.12,
+                              relx=0.35,
+                              rely=0.2)
 
-        # set the focus of the curser
-        self.entryName.focus()
-        
+         # set the focus of the curser
+         self.entryName.focus()
                
-        
-#***************START***OF***PASSWORD*************************************
-        self.labelPassword = Label(self.login,
-                               text="Password: ",
-                               font="Helvetica 12")
+        #***************START***OF***PASSWORD*************************************
+         self.labelPassword = Label(self.login,
+                                    text="Password: ",
+                                    font="Helvetica 12")
 
-        self.labelPassword.place(relheight=0.2,
-                             relx=0.1,
-                             rely=0.43)
+         self.labelPassword.place(relheight=0.2,
+                                  relx=0.1,
+                                  rely=0.43)
         
-        self.entryPassword = Entry(self.login,
-                                   font="Helvetica 14")
-        self.entryPassword.place(relwidth=0.4,
-                             relheight=0.12,
-                             relx=0.35,
-                             rely=0.43)
+         self.entryPassword = Entry(self.login,font="Helvetica 14")
+         self.entryPassword.place(relwidth=0.4,
+                                  relheight=0.12,
+                                  relx=0.35,
+                                  rely=0.43)
 
         
         #self.entryPassword.focus()
@@ -97,24 +94,22 @@ class GUI:
 
         # create a Continue Button
         # along with action
-        self.go = Button(self.login,
-                         text="CONTINUE",
-                         font="Helvetica 14 bold",
-                         command=lambda: self.goAhead(self.entryName.get()))
+         self.go = Button(self.login,
+                          text="CONTINUE",
+                          font="Helvetica 14 bold",
+                          command=lambda: self.goAhead((self.entryName.get(),self.entryPassword.get())))
 
-        self.go.place(relx=0.4,
-                      rely=0.55)
+         self.go.place(relx=0.15,
+                       rely=0.64)
         
 #***************Password*************************************       
-        self.regi = Button(self.login,
-                         text="REGISTER",
-                         font="Helvetica 14 bold",
-                         command=lambda: self.Register((self.entryName.get(),self.entryPassword.get())))
+         self.regi = Button(self.login,text="REGISTER",font="Helvetica 14 bold",
+                            command=lambda: self.Register((self.entryName.get(),self.entryPassword.get())))
         
-        self.regi.place(relx=0.45,
+         self.regi.place(relx=0.45,
                       rely=0.64)
 #*****************end of password*********************************       
-        self.Window.mainloop()
+         self.Window.mainloop()
 
 
         
