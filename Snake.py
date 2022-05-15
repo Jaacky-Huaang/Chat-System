@@ -142,12 +142,12 @@ class Snake():
     def __init__(self, multiplayer=False, HOST='127.0.0.1', PORT=65432):
         super().__init__()
         self.multiplayer = multiplayer
-        self.yellow = (255, 255, 0)
-        self.blue = (0, 0, 255)
-        self.green = (0, 255, 0)
-        self.red = (255, 0, 0)
-        self.magenta = (255, 0, 255)
-        self.cyan = (0, 255, 255)
+        self.yellow = (243, 232, 168)
+        self.blue = (195, 215, 223)
+        self.green = (178, 207,135)
+        self.red = (215, 159, 146)
+        self.magenta = (154, 50, 205)
+        self.cyan = (95, 120, 128)
         pygame.init()
         self.screen = pygame.display.set_mode((600, 600))
 
@@ -200,7 +200,7 @@ class Snake():
             self.direction = "Left"
 
     def GameLoop(self):
-        fps = 10
+        fps = 3
         frametime = 1/fps
         t = time.time()
         while self.running:

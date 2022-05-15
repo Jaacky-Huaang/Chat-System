@@ -15,6 +15,7 @@ from tkinter import ttk
 from chat_utils import *
 import json
 from tkinter import messagebox
+import os
 # GUI class for the chat
 
 
@@ -250,7 +251,20 @@ class GUI:
                              rely=0.008,
                              relheight=0.06,
                              relwidth=0.22)
+        
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈          
+        self.GameMsg = Button(self.labelBottom,
+                              text="Game",
+                              font="Helvetica 10 bold",
+                              width=20,
+                              bg="#ABB2B9",
+                              command=lambda: self.GameButton())
 
+        self.GameMsg.place(relx=0.54,
+                           rely=0.008,
+                           relheight=0.06,
+                           relwidth=0.22)
+#🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈 Online Gaming Part ! 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈  
         self.textCons.config(cursor="arrow")
 
         # create a scroll bar
@@ -266,6 +280,11 @@ class GUI:
         self.textCons.config(state=DISABLED)
 
     # function to basically start the thread for sending messages
+    
+    
+    def GameButton(self):
+        os.system("python Snake.py")
+        self.state=S_GAMING
 
     def sendButton(self, msg):
         # self.textCons.config(state=DISABLED)

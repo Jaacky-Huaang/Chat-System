@@ -106,7 +106,7 @@ class ServerWindow(QMainWindow):
         self.setFixedHeight(300)
 
         self.server_status = QLabel("  Server Status: Offline", self)
-        self.server_status.setStyleSheet("background-color: red")
+        self.server_status.setStyleSheet("background-color: gray")
         self.server_status.resize(150, 30)
         self.server_status.move(0, 0)
 
@@ -119,7 +119,7 @@ class ServerWindow(QMainWindow):
         start_btn.move(0, 200)
         start_btn.setStyleSheet("QPushButton"
                                 "{"
-                                "background-color : green;"
+                                "background-color : yellow;"
                                 "}")
         start_btn.clicked.connect(self.On_start)
 
@@ -129,14 +129,14 @@ class ServerWindow(QMainWindow):
         stop_btn.move(150, 200)
         stop_btn.setStyleSheet("QPushButton"
                                "{"
-                               "background-color : red;"
+                               "background-color : gray;"
                                "}")
         stop_btn.clicked.connect(self.On_stop)
     def PlayerList(self):
         pass
     def On_start(self):
         if not self.server_is_online:
-            self.server_status.setStyleSheet("background-color: green")
+            self.server_status.setStyleSheet("background-color: yellow")
             self.server_status.setText("  Server Status: Online")
             self.server = threading.Thread(target=self.ss.Start, args=())
             self.server.start()
@@ -147,7 +147,7 @@ class ServerWindow(QMainWindow):
     def On_stop(self):
 
         if self.server_is_online:
-            self.server_status.setStyleSheet("background-color: red")
+            self.server_status.setStyleSheet("background-color: gray")
             self.server_status.setText("  Server Status: Offline")
             print("Server is stopping...")
             self.ss.Stop()
